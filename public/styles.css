@@ -114,10 +114,19 @@ h1 {
   font-weight: 820;
 }
 
-.domain-label {
+.identity-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.identity-label {
   display: inline-flex;
+  align-items: center;
+  gap: 7px;
   max-width: 100%;
-  margin: 8px 0 0;
+  margin: 0;
   padding: 7px 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -128,6 +137,17 @@ h1 {
   line-height: 1.2;
   overflow-wrap: anywhere;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.identity-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
 }
 
 h2 {

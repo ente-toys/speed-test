@@ -38,6 +38,7 @@ const EXPORT_PADDING_PX = 24;
 const elements = Object.fromEntries(
   [
     "domain-label",
+    "network-label",
     "result-capture",
     "run-button",
     "share-button",
@@ -65,6 +66,7 @@ const state = {
 };
 
 elements.domainLabel.textContent = window.location.hostname;
+loadTrace();
 elements.runButton.addEventListener("click", runTest);
 elements.shareButton.addEventListener("click", shareResult);
 
@@ -133,6 +135,19 @@ function renderResults(results) {
   elements.jitterValue.textContent = formatNumber(results.getUnloadedJitter?.());
   elements.downloadLatencyValue.textContent = formatNumber(results.getDownLoadedLatency?.());
   elements.uploadLatencyValue.textContent = formatNumber(results.getUpLoadedLatency?.());
+}
+
+async function loadTrace() {
+  try {
+    const traceUrl = new URL("/api/trace", window.location.origin);
+    traceUrl.searchParams.set("t", Date.now().toString());
+    const response = await fetch(traceUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Trace failed: ${response.status}`);
+    elements.networkLabel.textContent = formatNetwork(await response.json());
+  } catch (error) {
+    elements.networkLabel.textContent = "Network unknown";
+    console.error(error);
+  }
 }
 
 function resetResults() {
@@ -297,6 +312,18 @@ function formatNumber(value, digits = 1) {
   if (value >= 100) return Math.round(value).toString();
   if (value >= 10) return value.toFixed(Math.min(digits, 1));
   return value.toFixed(digits);
+}
+
+function formatNetwork(trace) {
+  const organization = normalizeText(trace?.asOrganization);
+  const asnValue = Number(trace?.asn);
+  const asn = Number.isFinite(asnValue) && asnValue > 0 ? `ASN ${asnValue}` : "";
+  if (organization && asn) return `${organization} - ${asn}`;
+  return organization || asn || "Network unknown";
+}
+
+function normalizeText(value) {
+  return typeof value === "string" ? value.trim() : "";
 }
 
 function toKey(id) {

@@ -13,7 +13,28 @@
         <section class="summary" aria-labelledby="page-title">
           <div>
             <h1 id="page-title">Speed Test</h1>
-            <p class="domain-label" id="domain-label">-</p>
+            <div class="identity-row" aria-label="Test context">
+              <p class="identity-label">
+                <svg class="identity-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="M3 12h18"></path>
+                  <path d="M12 3a14 14 0 0 1 0 18"></path>
+                  <path d="M12 3a14 14 0 0 0 0 18"></path>
+                </svg>
+                <span id="domain-label">-</span>
+              </p>
+              <p class="identity-label">
+                <svg class="identity-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="5" r="2.5"></circle>
+                  <circle cx="5" cy="19" r="2.5"></circle>
+                  <circle cx="19" cy="19" r="2.5"></circle>
+                  <path d="M10.9 7.2 6.2 16.8"></path>
+                  <path d="m13.1 7.2 4.7 9.6"></path>
+                  <path d="M7.5 19h9"></path>
+                </svg>
+                <span id="network-label">Network unknown</span>
+              </p>
+            </div>
           </div>
           <div class="actions capture-exclude">
             <button class="secondary-action" id="share-button" type="button" hidden>Share result</button>
@@ -68,6 +89,6 @@
       <p class="footnote">A full run may transfer around 200 MB of data.</p>
     </main>
 
-    <script type="module" src="/app.js"></script>
+    <script type="module" src="/app.js?v=network-chip-20260603"></script>
   </body>
 </html>
