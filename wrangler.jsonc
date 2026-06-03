@@ -1,0 +1,8 @@
+{
+  "name": "speed-test",
+  "compatibility_date": "2026-06-03",
+  "main": "src/worker.js",
+  "assets": {
+    "directory": "public"
+  }
+}

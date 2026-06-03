@@ -6,8 +6,8 @@
   "scripts": {
     "test": "node --test",
     "dev:local": "node dev-server.mjs",
-    "dev": "npx wrangler pages dev public",
-    "deploy": "npx wrangler pages deploy public"
+    "dev": "npx wrangler dev",
+    "deploy": "npx wrangler deploy"
   },
   "devDependencies": {}
 }

@@ -3,9 +3,7 @@ import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
-import { onRequestGet as download } from "./functions/api/download.js";
-import { onRequestPost as upload } from "./functions/api/upload.js";
-import { onRequestGet as trace } from "./functions/api/trace.js";
+import { handleDownload, handleTrace, handleUpload } from "./src/api.js";
 
 const root = fileURLToPath(new URL("./public", import.meta.url));
 const port = Number(process.env.PORT || 4173);
@@ -14,15 +12,15 @@ createServer(async (incoming, outgoing) => {
   const url = new URL(incoming.url || "/", `http://${incoming.headers.host}`);
 
   if (url.pathname === "/api/download" && incoming.method === "GET") {
-    return sendWebResponse(outgoing, download({ request: toRequest(incoming, url) }));
+    return sendWebResponse(outgoing, handleDownload(toRequest(incoming, url)));
   }
 
   if (url.pathname === "/api/upload" && incoming.method === "POST") {
-    return sendWebResponse(outgoing, await upload({ request: toRequest(incoming, url) }));
+    return sendWebResponse(outgoing, await handleUpload(toRequest(incoming, url)));
   }
 
   if (url.pathname === "/api/trace" && incoming.method === "GET") {
-    return sendWebResponse(outgoing, trace({ request: toRequest(incoming, url) }));
+    return sendWebResponse(outgoing, handleTrace(toRequest(incoming, url)));
   }
 
   return serveStatic(url.pathname, outgoing);
