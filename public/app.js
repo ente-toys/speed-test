@@ -88,7 +88,7 @@ async function runTest() {
 async function measureLatency(results, count, bucket = "latency") {
   for (let index = 0; index < count; index += 1) {
     const started = performance.now();
-    const response = await fetch(`/__down?bytes=0&nonce=${crypto.randomUUID()}`, {
+    const response = await fetch(`/api/download?bytes=0&nonce=${crypto.randomUUID()}`, {
       cache: "no-store",
     });
     if (!response.ok) throw new Error(`Latency failed: ${response.status}`);
@@ -100,7 +100,7 @@ async function measureDownload(results) {
   let totalBytes = 0;
   for (const [index, bytes] of TRANSFER_SIZES.entries()) {
     const started = performance.now();
-    const response = await fetch(`/__down?bytes=${bytes}&nonce=${crypto.randomUUID()}`, {
+    const response = await fetch(`/api/download?bytes=${bytes}&nonce=${crypto.randomUUID()}`, {
       cache: "no-store",
     });
     if (!response.ok) throw new Error(`Download failed: ${response.status}`);
@@ -124,7 +124,7 @@ async function measureUpload(results) {
   for (const [index, bytes] of TRANSFER_SIZES.entries()) {
     const payload = payloadFor(bytes);
     const started = performance.now();
-    const response = await fetch(`/__up?nonce=${crypto.randomUUID()}`, {
+    const response = await fetch(`/api/upload?nonce=${crypto.randomUUID()}`, {
       method: "POST",
       body: payload,
       cache: "no-store",
@@ -148,7 +148,7 @@ async function measureUpload(results) {
 }
 
 async function warmupDownload() {
-  const response = await fetch(`/__down?bytes=${DOWNLOAD_WARMUP_BYTES}&nonce=${crypto.randomUUID()}`, {
+  const response = await fetch(`/api/download?bytes=${DOWNLOAD_WARMUP_BYTES}&nonce=${crypto.randomUUID()}`, {
     cache: "no-store",
   });
   if (!response.ok) throw new Error(`Download warm-up failed: ${response.status}`);
@@ -156,7 +156,7 @@ async function warmupDownload() {
 }
 
 async function warmupUpload() {
-  const response = await fetch(`/__up?nonce=${crypto.randomUUID()}`, {
+  const response = await fetch(`/api/upload?nonce=${crypto.randomUUID()}`, {
     method: "POST",
     body: payloadFor(UPLOAD_WARMUP_BYTES),
     cache: "no-store",
