@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Speed Test</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="summary" aria-labelledby="page-title">
+        <div>
+          <h1 id="page-title">Speed Test</h1>
+          <p class="domain-label" id="domain-label">-</p>
+        </div>
+        <button class="primary-action" id="run-button" type="button">Start Test</button>
+      </section>
+
+      <section class="status-panel" aria-live="polite">
+        <div class="status-row">
+          <span id="status-text">Ready</span>
+          <span id="progress-label">0%</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </section>
+
+      <section class="metric-grid" aria-label="Speed test results">
+        <article class="metric metric-large">
+          <span>Download</span>
+          <strong id="download-value">-</strong>
+          <small>Mbps</small>
+        </article>
+        <article class="metric metric-large">
+          <span>Upload</span>
+          <strong id="upload-value">-</strong>
+          <small>Mbps</small>
+        </article>
+        <article class="metric">
+          <span>Latency</span>
+          <strong id="latency-value">-</strong>
+          <small>ms</small>
+        </article>
+        <article class="metric">
+          <span>Jitter</span>
+          <strong id="jitter-value">-</strong>
+          <small>ms</small>
+        </article>
+        <article class="metric">
+          <span>Latency During Download</span>
+          <strong id="download-latency-value">-</strong>
+          <small>ms</small>
+        </article>
+        <article class="metric">
+          <span>Latency During Upload</span>
+          <strong id="upload-latency-value">-</strong>
+          <small>ms</small>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

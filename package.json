@@ -1,0 +1,13 @@
+{
+  "name": "same-origin-speed-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "dev:local": "node dev-server.mjs",
+    "dev": "npx wrangler pages dev public",
+    "deploy": "npx wrangler pages deploy public"
+  },
+  "devDependencies": {}
+}
