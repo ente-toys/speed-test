@@ -1,4 +1,5 @@
 import SpeedTest from "@cloudflare/speedtest";
+import { toPng } from "html-to-image";
 
 const MEASUREMENTS = [
   { type: "latency", numPackets: 18 },
@@ -32,11 +33,17 @@ const EXPECTED_STAGE_MS = {
   finishing: 1600,
 };
 
+const EXPORT_PADDING_PX = 24;
+
 const elements = Object.fromEntries(
   [
     "domain-label",
+    "result-capture",
     "run-button",
+    "share-button",
     "status-text",
+    "status-panel",
+    "status-icon",
     "progress-label",
     "progress-fill",
     "download-value",
@@ -59,6 +66,7 @@ const state = {
 
 elements.domainLabel.textContent = window.location.hostname;
 elements.runButton.addEventListener("click", runTest);
+elements.shareButton.addEventListener("click", shareResult);
 
 function runTest() {
   if (state.test?.isRunning) return;
@@ -87,6 +95,7 @@ function runTest() {
       stopProgressAnimation();
       elements.runButton.disabled = false;
       elements.runButton.textContent = "Retest";
+      elements.shareButton.hidden = true;
     }
   };
 
@@ -97,18 +106,18 @@ function runTest() {
 
   test.onError = (error) => {
     stopProgressAnimation();
+    elements.statusPanel.classList.remove("is-complete");
     updateProgress("Test failed. Please retry.", state.progress);
     elements.runButton.disabled = false;
     elements.runButton.textContent = "Retest";
+    elements.shareButton.hidden = true;
     console.error(error);
   };
 
   test.onFinish = (results) => {
     stopProgressAnimation();
     renderResults(results);
-    updateProgress("Complete", 100);
-    elements.runButton.disabled = false;
-    elements.runButton.textContent = "Retest";
+    finishProgress();
   };
 
   updateProgress("Starting", 0);
@@ -128,6 +137,8 @@ function renderResults(results) {
 
 function resetResults() {
   stopProgressAnimation();
+  elements.statusPanel.classList.remove("is-complete");
+  elements.shareButton.hidden = true;
   for (const key of [
     "downloadValue",
     "uploadValue",
@@ -177,6 +188,74 @@ function stopProgressAnimation() {
   }
 }
 
+function finishProgress() {
+  setStage("finishing", "Finishing");
+  animateToProgress(99, 900, () => {
+    updateProgress("Complete", 100);
+    elements.statusPanel.classList.add("is-complete");
+    elements.runButton.disabled = false;
+    elements.runButton.textContent = "Retest";
+    elements.shareButton.hidden = false;
+  });
+}
+
+async function shareResult() {
+  const originalText = elements.shareButton.textContent;
+  elements.shareButton.disabled = true;
+  elements.shareButton.textContent = "Preparing";
+
+  try {
+    const rect = elements.resultCapture.getBoundingClientRect();
+    const backgroundColor = getComputedStyle(document.body).backgroundColor;
+    const dataUrl = await toPng(elements.resultCapture, {
+      backgroundColor,
+      cacheBust: true,
+      filter: (node) => !node.classList?.contains("capture-exclude"),
+      height: Math.ceil(rect.height) + EXPORT_PADDING_PX * 2,
+      pixelRatio: Math.min(2, window.devicePixelRatio || 1),
+      style: {
+        backgroundColor,
+        boxSizing: "content-box",
+        padding: `${EXPORT_PADDING_PX}px`,
+        width: `${Math.ceil(rect.width)}px`,
+      },
+      width: Math.ceil(rect.width) + EXPORT_PADDING_PX * 2,
+    });
+
+    const link = document.createElement("a");
+    link.download = `speed-test-${safeFilePart(window.location.hostname)}.png`;
+    link.href = dataUrl;
+    link.click();
+  } catch (error) {
+    console.error(error);
+    updateProgress("Could not export result.", state.progress);
+  } finally {
+    elements.shareButton.disabled = false;
+    elements.shareButton.textContent = originalText;
+  }
+}
+
+function animateToProgress(target, durationMs, onDone) {
+  const start = state.progress;
+  const startedAt = performance.now();
+
+  const tick = () => {
+    const elapsed = performance.now() - startedAt;
+    const ratio = Math.min(1, elapsed / durationMs);
+    const eased = 1 - (1 - ratio) ** 3;
+    const next = start + (target - start) * eased;
+    updateProgress(elements.statusText.textContent, Math.round(next));
+
+    if (ratio < 1) {
+      window.requestAnimationFrame(tick);
+    } else {
+      onDone?.();
+    }
+  };
+
+  window.requestAnimationFrame(tick);
+}
+
 function advanceProgress() {
   const stage = STAGE_PROGRESS[state.stage] || STAGE_PROGRESS.finishing;
   const expectedMs = EXPECTED_STAGE_MS[state.stage] || EXPECTED_STAGE_MS.finishing;
@@ -222,4 +301,8 @@ function formatNumber(value, digits = 1) {
 
 function toKey(id) {
   return id.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+function safeFilePart(value) {
+  return (value || "result").replace(/[^a-z0-9.-]+/gi, "-").replace(/^-+|-+$/g, "");
 }

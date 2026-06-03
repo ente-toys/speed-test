@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@cloudflare/speedtest": "^1.10.1",
-    "esbuild": "^0.28.0"
+    "esbuild": "^0.28.0",
+    "html-to-image": "^1.11.13"
   }
 }
