@@ -344,42 +344,12 @@ h2 {
 }
 
 .footnote {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
   margin: 42px 0 0;
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 500;
   line-height: 1.35;
   text-align: center;
-}
-
-.footnote a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  color: inherit;
-  opacity: 0.72;
-  text-decoration: none;
-}
-
-.footnote a:hover {
-  opacity: 1;
-  text-decoration: underline;
-}
-
-.external-icon {
-  width: 12px;
-  height: 12px;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
 }
 
 @media (prefers-color-scheme: dark) {
