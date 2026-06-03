@@ -4,10 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "esbuild src/browser-app.js --bundle --format=esm --outfile=public/app.js",
     "test": "node --test",
-    "dev:local": "node dev-server.mjs",
-    "dev": "npx wrangler dev",
-    "deploy": "npx wrangler deploy"
+    "dev:local": "npm run build && node dev-server.mjs",
+    "dev": "npm run build && npx wrangler dev",
+    "deploy": "npm run build && npx wrangler deploy"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@cloudflare/speedtest": "^1.10.1",
+    "esbuild": "^0.28.0"
+  }
 }

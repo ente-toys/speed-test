@@ -7,6 +7,8 @@ latency against the domain it is served from. There is no domain-specific config
 in the app, so the same build can be deployed to multiple hostnames. Transfer
 payloads are generated test bytes.
 
+Browser measurements use `@cloudflare/speedtest`.
+
 ## Run locally
 
 ```sh
@@ -23,6 +25,12 @@ http://127.0.0.1:4173
 
 ```sh
 npm test
+```
+
+## Build
+
+```sh
+npm run build
 ```
 
 ## Cloudflare
