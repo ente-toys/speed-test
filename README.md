@@ -9,6 +9,11 @@ payloads are generated test bytes.
 
 Browser measurements use `@cloudflare/speedtest`.
 
+## Measurements
+
+Each run uses 6 download and 6 upload requests: 256 KB, 1 MB, 4 MB, 12 MB,
+24 MB, and 48 MB. That is about 85 MB downloaded and 85 MB uploaded.
+
 ## Run locally
 
 ```sh
