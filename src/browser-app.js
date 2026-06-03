@@ -16,6 +16,22 @@ const MEASUREMENTS = [
   { type: "upload", bytes: 48_000_000, count: 1 },
 ];
 
+const STAGE_PROGRESS = {
+  starting: { ceiling: 6 },
+  latency: { ceiling: 22 },
+  download: { ceiling: 62 },
+  upload: { ceiling: 96 },
+  finishing: { ceiling: 99 },
+};
+
+const EXPECTED_STAGE_MS = {
+  starting: 900,
+  latency: 2800,
+  download: 9000,
+  upload: 12000,
+  finishing: 1600,
+};
+
 const elements = Object.fromEntries(
   [
     "domain-label",
@@ -34,6 +50,10 @@ const elements = Object.fromEntries(
 
 const state = {
   progress: 0,
+  progressTimer: null,
+  stage: "starting",
+  stageStartProgress: 0,
+  stageStartedAt: 0,
   test: null,
 };
 
@@ -64,17 +84,19 @@ function runTest() {
 
   test.onRunningChange = (running) => {
     if (!running && !test.isFinished) {
+      stopProgressAnimation();
       elements.runButton.disabled = false;
       elements.runButton.textContent = "Retest";
     }
   };
 
   test.onResultsChange = ({ type }) => {
-    updateProgress(statusFor(type), Math.min(94, state.progress + progressStep(type)));
+    setStage(stageFor(type), statusFor(type));
     renderResults(test.results);
   };
 
   test.onError = (error) => {
+    stopProgressAnimation();
     updateProgress("Test failed. Please retry.", state.progress);
     elements.runButton.disabled = false;
     elements.runButton.textContent = "Retest";
@@ -82,6 +104,7 @@ function runTest() {
   };
 
   test.onFinish = (results) => {
+    stopProgressAnimation();
     renderResults(results);
     updateProgress("Complete", 100);
     elements.runButton.disabled = false;
@@ -89,6 +112,8 @@ function runTest() {
   };
 
   updateProgress("Starting", 0);
+  setStage("starting", "Starting");
+  startProgressAnimation();
   test.play();
 }
 
@@ -102,6 +127,7 @@ function renderResults(results) {
 }
 
 function resetResults() {
+  stopProgressAnimation();
   for (const key of [
     "downloadValue",
     "uploadValue",
@@ -115,6 +141,13 @@ function resetResults() {
   updateProgress("Starting", 0);
 }
 
+function stageFor(type) {
+  if (type === "latency") return "latency";
+  if (type === "download") return "download";
+  if (type === "upload") return "upload";
+  return "finishing";
+}
+
 function statusFor(type) {
   if (type === "latency") return "Measuring latency";
   if (type === "download") return "Measuring download";
@@ -122,11 +155,36 @@ function statusFor(type) {
   return "Running";
 }
 
-function progressStep(type) {
-  if (type === "latency") return 8;
-  if (type === "download") return 10;
-  if (type === "upload") return 10;
-  return 4;
+function setStage(stage, label) {
+  if (stage !== state.stage) {
+    state.stage = stage;
+    state.stageStartProgress = state.progress;
+    state.stageStartedAt = performance.now();
+  }
+  elements.statusText.textContent = label;
+}
+
+function startProgressAnimation() {
+  stopProgressAnimation();
+  state.stageStartedAt = performance.now();
+  state.progressTimer = window.setInterval(advanceProgress, 120);
+}
+
+function stopProgressAnimation() {
+  if (state.progressTimer) {
+    window.clearInterval(state.progressTimer);
+    state.progressTimer = null;
+  }
+}
+
+function advanceProgress() {
+  const stage = STAGE_PROGRESS[state.stage] || STAGE_PROGRESS.finishing;
+  const expectedMs = EXPECTED_STAGE_MS[state.stage] || EXPECTED_STAGE_MS.finishing;
+  const elapsed = performance.now() - state.stageStartedAt;
+  const ratio = 1 - Math.exp(-elapsed / expectedMs);
+  const target = state.stageStartProgress + (stage.ceiling - state.stageStartProgress) * ratio;
+  const next = Math.max(state.progress, Math.min(stage.ceiling, target));
+  updateProgress(elements.statusText.textContent, Math.round(next));
 }
 
 function updateProgress(label, percent) {
