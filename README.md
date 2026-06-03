@@ -7,9 +7,9 @@ latency against the domain it is served from. There is no domain-specific config
 in the app, so the same build can be deployed to multiple hostnames. Transfer
 payloads are generated test bytes.
 
-Browser measurements use `@cloudflare/speedtest`.
-
 ## Measurements
+
+Measurements use [cloudflare/speedtest](https://github.com/cloudflare/speedtest).
 
 Each run uses 6 download and 6 upload requests: 256 KB, 1 MB, 4 MB, 12 MB,
 24 MB, and 48 MB. That is about 85 MB downloaded and 85 MB uploaded.
