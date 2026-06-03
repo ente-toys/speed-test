@@ -1,6 +1,6 @@
 # Speed Test
 
-A small same-origin speed test for Cloudflare Pages.
+Same-origin speed test for Cloudflare Pages.
 
 The page measures download speed, upload speed, idle latency, jitter, and loaded
 latency against the domain it is served from. There is no domain-specific config
