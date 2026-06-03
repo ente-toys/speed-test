@@ -1585,8 +1585,8 @@ function runTest() {
   test.play();
 }
 function renderResults(results) {
-  elements.downloadValue.textContent = formatNumber(bpsToMbps(results.getDownloadBandwidth?.()));
-  elements.uploadValue.textContent = formatNumber(bpsToMbps(results.getUploadBandwidth?.()));
+  elements.downloadValue.textContent = formatNumber(observedBandwidthMbps(results, "download"));
+  elements.uploadValue.textContent = formatNumber(observedBandwidthMbps(results, "upload"));
   elements.latencyValue.textContent = formatNumber(results.getUnloadedLatency?.());
   elements.jitterValue.textContent = formatNumber(results.getUnloadedJitter?.());
   elements.downloadLatencyValue.textContent = formatNumber(results.getDownLoadedLatency?.());
@@ -1627,6 +1627,13 @@ function updateProgress(label, percent) {
 function bpsToMbps(value) {
   if (!Number.isFinite(value)) return null;
   return value / 1e6;
+}
+function observedBandwidthMbps(results, direction) {
+  const finalBps = direction === "download" ? results.getDownloadBandwidth?.() : results.getUploadBandwidth?.();
+  if (Number.isFinite(finalBps) && finalBps > 0) return bpsToMbps(finalBps);
+  const points = direction === "download" ? results.getDownloadBandwidthPoints?.() : results.getUploadBandwidthPoints?.();
+  const latestPositive = [...points || []].reverse().find((point) => point?.bps > 0);
+  return bpsToMbps(latestPositive?.bps);
 }
 function formatNumber(value, digits = 1) {
   if (!Number.isFinite(value)) return "-";
