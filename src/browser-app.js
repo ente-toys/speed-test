@@ -38,6 +38,7 @@ const EXPORT_PADDING_PX = 24;
 const elements = Object.fromEntries(
   [
     "domain-label",
+    "network-chip",
     "network-label",
     "result-capture",
     "run-button",
@@ -66,7 +67,6 @@ const state = {
 };
 
 elements.domainLabel.textContent = window.location.hostname;
-loadTrace();
 elements.runButton.addEventListener("click", runTest);
 elements.shareButton.addEventListener("click", shareResult);
 
@@ -74,6 +74,7 @@ function runTest() {
   if (state.test?.isRunning) return;
 
   resetResults();
+  loadTrace();
   elements.runButton.disabled = true;
   elements.runButton.textContent = "Running";
 
@@ -143,11 +144,16 @@ async function loadTrace() {
     traceUrl.searchParams.set("t", Date.now().toString());
     const response = await fetch(traceUrl, { cache: "no-store" });
     if (!response.ok) throw new Error(`Trace failed: ${response.status}`);
-    elements.networkLabel.textContent = formatNetwork(await response.json());
+    setNetworkLabel(formatNetwork(await response.json()));
   } catch (error) {
-    elements.networkLabel.textContent = "Network unknown";
+    setNetworkLabel("");
     console.error(error);
   }
+}
+
+function setNetworkLabel(label) {
+  elements.networkLabel.textContent = label;
+  elements.networkChip.hidden = !label;
 }
 
 function resetResults() {
@@ -318,8 +324,7 @@ function formatNetwork(trace) {
   const organization = normalizeText(trace?.asOrganization);
   const asnValue = Number(trace?.asn);
   const asn = Number.isFinite(asnValue) && asnValue > 0 ? `ASN ${asnValue}` : "";
-  if (organization && asn) return `${organization} - ${asn}`;
-  return organization || asn || "Network unknown";
+  return asn || organization;
 }
 
 function normalizeText(value) {
