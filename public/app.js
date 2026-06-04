@@ -2336,6 +2336,7 @@ var elements = Object.fromEntries(
     "network-chip",
     "network-label",
     "result-capture",
+    "actions",
     "run-button",
     "share-button",
     "status-text",
@@ -2365,6 +2366,7 @@ elements.shareButton.addEventListener("click", shareResult);
 function runTest() {
   if (state.test?.isRunning) return;
   resetResults();
+  elements.actions.classList.remove("is-complete");
   loadTrace();
   elements.runButton.disabled = true;
   elements.runButton.textContent = "Running";
@@ -2387,6 +2389,7 @@ function runTest() {
       elements.runButton.disabled = false;
       elements.runButton.textContent = "Retest";
       elements.shareButton.hidden = true;
+      elements.actions.classList.remove("is-complete");
     }
   };
   test.onResultsChange = ({ type }) => {
@@ -2400,6 +2403,7 @@ function runTest() {
     elements.runButton.disabled = false;
     elements.runButton.textContent = "Retest";
     elements.shareButton.hidden = true;
+    elements.actions.classList.remove("is-complete");
     console.error(error);
   };
   test.onFinish = (results) => {
@@ -2491,6 +2495,7 @@ function finishProgress() {
     elements.runButton.disabled = false;
     elements.runButton.textContent = "Retest";
     elements.shareButton.hidden = false;
+    elements.actions.classList.add("is-complete");
   });
 }
 async function shareResult() {
